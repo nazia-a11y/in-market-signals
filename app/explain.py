@@ -4,20 +4,20 @@ import anthropic
 
 from app import config
 
-PROMPT = """You are helping a B2B sales team decide who to contact today.
-Here is everything we know about one company:
+PROMPT = """Here is everything we know about one company that visited our website:
 
 {facts}
 
-Write two short sentences explaining why this company looks ready to buy.
-Use only the facts above. Do not invent anything.
-Then write one opening line for a sales email that does not mention tracking or intent data.
-Reply only with JSON using the keys "why" and "opener"."""
+In no more than two short sentences, explain why this company appears to be in market right now.
+Refer to the strongest signals only: the pages it visited and the topics it is researching.
+Use only the facts above and do not invent anything. Write in plain British English,
+with no greeting, no recommendation and no selling.
+Reply only with JSON using the key "why"."""
 
 
 def explain(account):
     if not config.ANTHROPIC_API_KEY:
-        return {"why": "AI step skipped: no API key set.", "opener": ""}
+        return {"why": "AI step skipped: no API key set."}
 
     facts = json.dumps(
         {k: account[k] for k in ("company", "industry", "employees", "country", "visits", "pages", "surges", "score", "reasons")},
@@ -31,11 +31,11 @@ def explain(account):
     )
     parts = [b.text for b in message.content if getattr(b, "type", "") == "text"]
     if not parts:
-        return {"why": "AI step returned no text.", "opener": ""}
+        return {"why": "AI step returned no text."}
     text = parts[0].strip()
     if text.startswith("```"):
         text = text.split("\n", 1)[1].rsplit("```", 1)[0]
     try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        return {"why": text, "opener": ""}
+        return {"why": json.loads(text).get("why", "")}
+    except (json.JSONDecodeError, AttributeError):
+        return {"why": text}

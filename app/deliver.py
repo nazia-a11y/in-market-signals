@@ -32,15 +32,11 @@ def post_to_slack(hot):
         print("Slack skipped")
         return
     if not hot:
-        text = "No in-market accounts today."
+        text = "No in-market accounts in your ICP today."
     else:
-        lines = ["*Today's in-market accounts*"]
+        lines = ["*In market today, and in your ICP*"]
         for a in hot:
-            lines.append(
-                f"• *{a['company']}* ({a['domain']}), score {a['score']}\n"
-                f"    {a['ai']['why']}\n"
-                f"    _Opener:_ {a['ai']['opener']}"
-            )
+            lines.append(f"\u2022 *{a['company']}* ({a['domain']}), score {a['score']}\n    {a['ai']['why']}")
         text = "\n".join(lines)
     requests.post(config.SLACK_WEBHOOK_URL, json={"text": text}, timeout=30).raise_for_status()
 

@@ -17,7 +17,7 @@ def main():
     chosen = {a["domain"] for a in actionable}
 
     for a in accounts:
-        a["ai"] = explain.explain(a) if a["domain"] in chosen else {"why": "", "opener": ""}
+        a["ai"] = explain.explain(a) if a["domain"] in chosen else {"why": ""}
 
     deliver.save_results(accounts, run_date, rules)
     deliver.post_to_slack(actionable)
