@@ -24,16 +24,16 @@ def website_points(visit, as_of):
     if any("pricing" in p for p in paths):
         add(15, "Viewed pricing")
     if visit.get("visits", 0) >= 3:
-        add(10, f"{visit['visits']} visits")
+        add(10, f"{visit['visits']} separate visits in the last 7 days")
     if any("/case-studies/" in p for p in paths):
         add(5, "Read a case study")
     if len(paths) >= 5:
         add(5, f"Read {len(paths)} different pages")
     total = sum(v["seconds"] for v in views)
     if total >= 600:
-        add(5, f"{total // 60} minutes on site")
+        add(5, f"{total // 60} minutes on site in total")
     if views and as_of - max(datetime.fromisoformat(v["visited_at"]) for v in views) <= timedelta(days=2):
-        add(5, "Visited in the last 2 days")
+        add(5, "Most recent visit was in the last 2 days")
     return points, reasons
 
 

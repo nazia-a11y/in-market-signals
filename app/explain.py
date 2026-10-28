@@ -9,8 +9,9 @@ PROMPT = """Here is everything we know about one company that visited our websit
 {facts}
 
 In no more than two short sentences, explain why this company appears to be in market right now.
-Refer to the strongest signals only: the pages it visited and the topics it is researching.
-Use only the facts above and do not invent anything. Write in plain British English,
+Start with the company's name. Refer to the strongest signals only: the pages it visited and the topics it is researching.
+Use only the facts above, exactly as stated. Keep each fact separate: never combine two facts into one claim,
+and never describe a page more specifically than its address shows. Write in plain British English,
 with no greeting, no recommendation and no selling.
 Reply only with JSON using the key "why"."""
 
