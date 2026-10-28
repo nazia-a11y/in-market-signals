@@ -21,6 +21,9 @@ h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
 .tag{font-size:12px;font-weight:500;color:#4B5563;background:#E9EBEF;border-radius:999px;padding:3px 10px}
 .updated{display:flex;align-items:center;gap:8px;font-size:14px;color:#374151}
 .dot{width:8px;height:8px;border-radius:999px;background:#16A34A}
+.hright{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.gh{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 16px;border-radius:999px;background:#111827;color:#fff;font-size:14px;font-weight:600;text-decoration:none;transition:background .2s}
+.gh:hover{background:#2F5BD3;color:#fff}
 .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px}
 .cardback{background:var(--back);border:1px solid var(--backline);border-radius:14px;padding:18px 20px;color:var(--backink)}
@@ -124,6 +127,7 @@ const I = {
   intent: '<path d="M4 18l5-6 4 3 7-9"/><path d="M15 6h5v5"/>',
   score: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
   icp: '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
+  code: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/></svg>',
   ai: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>'
 };
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -204,7 +208,7 @@ function render() {
   const runDate = RUN ? day(new Date(RUN + 'T06:00')) : '';
   let h = '';
   h += '<header><div class="brand"><div class="logo">' + I.logo + '</div><h1>In-Market Signals</h1><span class="tag">Sample data</span></div>'
-    + '<div class="updated"><span class="dot" aria-hidden="true"></span><span>Updated automatically · ' + esc(runDate) + ', 06:00</span></div></header>';
+    + '<div class="hright"><div class="updated"><span class="dot" aria-hidden="true"></span><span>Updated automatically · ' + esc(runDate) + ', 06:00</span></div><a class="gh" href="' + REPO + '" target="_blank" rel="noopener">' + I.code + 'View the code on GitHub</a></div></header>';
 
   h += '<section class="kpis" aria-label="Today in numbers">';
   h += face('k1', '<div class="card kpi"><div class="lab">Visited the website</div><div class="num">' + ACC.length + '</div></div>',
