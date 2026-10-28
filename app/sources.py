@@ -1,6 +1,4 @@
 import json
-import random
-from datetime import date
 from pathlib import Path
 
 from app import config
@@ -19,9 +17,6 @@ def clean_domain(d):
 def get_visits():
     if config.DEMO_MODE:
         rows = json.loads((DEMO_DIR / "lead_forensics_visits.json").read_text())
-        rng = random.Random("visits" + date.today().isoformat())
-        for r in rows:
-            r["visits"] = max(1, r["visits"] + rng.randint(-2, 2))
     else:
         rows = fetch_real_visits()
     for r in rows:
@@ -32,9 +27,6 @@ def get_visits():
 def get_surge(domains):
     if config.DEMO_MODE:
         rows = json.loads((DEMO_DIR / "bombora_surge.json").read_text())
-        rng = random.Random("surge" + date.today().isoformat())
-        for r in rows:
-            r["surge_score"] = min(100, max(40, r["surge_score"] + rng.randint(-8, 8)))
     else:
         rows = fetch_real_surge(domains)
     for r in rows:

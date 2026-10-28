@@ -54,6 +54,7 @@ def build_accounts(visits, surge_rows, rules):
             "country": v.get("country"),
             "visits": v.get("visits", 0),
             "pages": v.get("pages", []),
+            "page_views": v.get("page_views", []),
             "surges": surges,
             "score": score,
             "reasons": reasons,
