@@ -28,14 +28,25 @@ flowchart TD
 
 **Rules score, AI explains.** The score comes from transparent rules, so anyone can see exactly why an account is on the list and the result is the same every time. The AI only turns those facts into a short, neutral summary. It is told to use nothing but the facts it is given.
 
-| Signal | Source | Points |
-| --- | --- | --- |
-| Viewed the pricing page | Lead Forensics | 30 |
-| Read a case study | Lead Forensics | 10 |
-| 3 or more visits | Lead Forensics | 20 |
-| Surge of 70+ on one of our topics | Bombora | 40 |
-| Surge of 60 to 69 on one of our topics | Bombora | 20 |
-| Surging on 2 or more of our topics | Bombora | 10 |
+| Website behaviour (Lead Forensics), up to 60 | Points |
+| --- | --- |
+| Visited the contact page | 15 |
+| Viewed pricing | 15 |
+| 3 or more visits | 10 |
+| Read a case study | 5 |
+| Read 5 or more different pages | 5 |
+| 10 or more minutes on the site | 5 |
+| Visited in the last 2 days | 5 |
+
+Page views under 30 seconds are treated as bounces and ignored.
+
+| Topic research (Bombora), up to 50 | Points |
+| --- | --- |
+| Surge of 70+ on one of our topics | 40 |
+| Surge of 60 to 69 on one of our topics | 20 |
+| Surging (60+) on 2 or more of our topics | 10 |
+
+Neither source can reach 70 on its own, so an account only counts as in market when our own data and third-party data agree. The total is capped at 100.
 
 An account scoring 70 or more that also fits the ICP is **actionable**.
 
