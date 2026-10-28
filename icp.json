@@ -1,0 +1,8 @@
+{
+  "industries": ["Financial Services", "Healthcare", "Logistics", "Manufacturing", "Retail"],
+  "min_employees": 200,
+  "max_employees": 5000,
+  "countries": ["United Kingdom"],
+  "exclude_domains": ["lomond-bank.example"],
+  "exclude_hubspot_stages": ["customer", "opportunity"]
+}
