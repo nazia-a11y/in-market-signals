@@ -41,6 +41,8 @@ An account scoring 70 or more that also fits the ICP is **actionable**.
 
 **Existing customers are excluded automatically.** Each run checks HubSpot for companies that are customers or have an open deal. A customer browsing the pricing page looks exactly like a hot lead, and sales should never be sent one by mistake.
 
+**Topics follow Bombora's taxonomy.** The ICP lists the intent topics we sell into by their Bombora Topic ID (for example Colocation, 1500174), and surges are matched on that ID rather than the name, so a renamed topic cannot silently break the scoring.
+
 **Low cost by design.** Only actionable accounts are sent to the AI, and it uses Claude Haiku, which is more than capable of writing two sentences from a set of facts. A daily run costs a few pence.
 
 **Privacy.** Suggested email openers never mention tracking or intent data. Only firmographic and behavioural facts about companies are sent to the AI, never personal data. Real data belongs in a private repository and a private dataset.
