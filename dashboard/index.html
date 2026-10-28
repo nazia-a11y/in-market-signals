@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In-Market Signals</title>
+<meta name="description" content="Website visits and Bombora intent combined into a daily, AI-summarised list of in-market accounts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--accent:#2F5BD3;--ink:#111827;--muted:#6B7280;--line:#E5E7EB;--soft:#F0F1F3;--bg:#F4F5F7;--back:#F5F8FF;--backline:#C9D6F5;--backink:#1F2A44}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Inter,system-ui,sans-serif;color:var(--ink)}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+button{font-family:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+h1{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.tag{font-size:12px;font-weight:500;color:#4B5563;background:#E9EBEF;border-radius:999px;padding:3px 10px}
+.updated{display:flex;align-items:center;gap:8px;font-size:14px;color:#374151}
+.dot{width:8px;height:8px;border-radius:999px;background:#16A34A}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.cardback{background:var(--back);border:1px solid var(--backline);border-radius:14px;padding:18px 20px;color:var(--backink)}
+.kpi{min-height:150px;padding:16px 20px}
+.kpi .lab{font-size:13px;font-weight:500;color:#4B5563;padding-right:36px}
+.kpi .num{font-size:38px;font-weight:700;line-height:1.15;margin-top:6px}
+.kpi.hero{background:var(--accent);border-color:var(--accent);color:#fff}
+.kpi.hero .lab{color:#E0E7FF}
+.cardback .lab{font-size:13px;font-weight:600;padding-right:36px;margin-bottom:6px;color:var(--backink)}
+.rel{position:relative}
+.fbtn{position:absolute;top:14px;right:14px}
+.kpis .fbtn{top:10px;right:10px}
+@keyframes flipin{from{transform:perspective(900px) rotateY(-80deg);opacity:.3}to{transform:perspective(900px) rotateY(0);opacity:1}}
+.flip{animation:flipin .38s ease-out}
+.flipbtn{width:32px;height:32px;border-radius:999px;border:1px solid #D7DCE5;background:#fff;color:#4B5563;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s,border-color .2s}
+.flipbtn:hover{transform:scale(1.08);border-color:#9AA8C7;color:var(--backink)}
+.flipbtn.close{background:var(--backink);border-color:var(--backink);color:#fff}
+.flipbtn.light{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.45);color:#fff}
+@media (prefers-reduced-motion:reduce){.flip{animation:none}.flipbtn:hover{transform:none}}
+h2{margin:0 0 10px;font-size:17px;font-weight:700;padding-right:40px}
+.cols{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+main{flex:999 1 600px;min-width:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+aside{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.6fr) minmax(0,1.6fr) 120px 24px;gap:12px}
+.thead{padding:8px 20px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-top:1px solid var(--soft);border-bottom:1px solid var(--soft);background:#FAFAFB}
+.row{border-bottom:1px solid var(--soft)}
+.rowbtn{width:100%;text-align:left;background:#fff;border:0;cursor:pointer;padding:14px 20px;align-items:center;color:var(--ink);min-height:64px}
+.rowbtn.open{background:#F8FAFF}
+.rowbtn:hover{background:#FAFBFF}
+.stack{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cname{font-size:15px;font-weight:600}
+.small{font-size:13px;color:var(--muted)}
+.new{font-size:11px;font-weight:600;color:#065F46;background:#D1FAE5;border-radius:999px;padding:1px 8px}
+.surge{display:inline-flex;align-items:center;gap:6px;font-size:13px;width:fit-content;background:#FFF1E7;color:#9A3412;border-radius:6px;padding:2px 8px}
+.bar{flex:1;height:8px;background:#EEF0F3;border-radius:999px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--accent);border-radius:999px}
+.detail{padding:4px 20px 20px;background:#F8FAFF;display:flex;flex-direction:column;gap:16px}
+.cap{font-size:12px;font-weight:600;color:#4B5563;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.why{margin:0;font-size:14.5px;line-height:1.55;max-width:760px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.line{display:flex;justify-content:space-between;gap:8px;font-size:13px;padding:3px 0;color:#374151}
+.pts{font-weight:600;color:#166534}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+th{text-align:left;color:var(--muted);font-size:12px;padding:8px 12px;font-weight:600;border-bottom:1px solid var(--line)}
+td{padding:7px 12px;border-bottom:1px solid var(--soft)}
+td.path{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;word-break:break-all}
+tr.bounce{color:#9CA3AF}
+.bnc{font-size:11px;font-weight:600;color:var(--muted);background:#F1F2F4;border-radius:999px;padding:1px 7px;margin-right:6px}
+.flow{display:flex;align-items:flex-start;gap:2px}
+.step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0}
+.ico{width:40px;height:40px;border-radius:12px;background:#EEF3FF;color:var(--accent);display:flex;align-items:center;justify-content:center}
+.step span:last-child{font-size:12px;color:#374151;text-align:center;line-height:1.3}
+.arrow{color:#9CA3AF;font-size:14px;margin-top:12px}
+ol{margin:0 0 12px;padding-left:18px;font-size:13.5px;line-height:1.55}
+.p{margin:0 0 8px;font-size:13.5px;line-height:1.55}
+.label{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{min-height:36px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid #D1D5DB;background:#fff;color:#374151}
+.chip.on{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:16px}
+.seg button{min-height:40px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid #D1D5DB;background:#fff;color:#374151}
+.seg button.on{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:600}
+.reset{margin-left:auto;background:none;border:0;color:#1D4ED8;font-size:13px;font-weight:600;cursor:pointer;padding:6px 0;min-height:32px}
+.lrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--soft)}
+.pill{font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.grey{color:#4B5563;background:#F1F2F4}.blue{color:#1E3A8A;background:#E0E7FF}.amber{color:#7C4A03;background:#FDF0D5}.green{color:#166534;background:#DCFCE7}
+.lrow .stack{flex:1 1 auto}.lrow .pill{white-space:normal;text-align:right;max-width:62%;line-height:1.35}
+.msg{padding:28px 20px;color:#4B5563;font-size:15px;margin:0}
+footer{font-size:12.5px;color:var(--muted);text-align:center}
+.listwrap{overflow-x:auto}.minw{min-width:640px}
+@media (max-width:720px){.kpis{grid-template-columns:1fr}.kpi{min-height:0}.two{grid-template-columns:1fr}.minw{min-width:0}.thead{display:none}.rowbtn.grid{grid-template-columns:minmax(0,1fr) 92px 20px;row-gap:8px;padding:14px 16px}.c-co{grid-area:1/1}.c-sc{grid-area:1/2}.c-ch{grid-area:1/3}.c-vi{grid-area:2/1/3/4}.c-to{grid-area:3/1/4/4}.detail{padding:4px 16px 18px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><p class="msg">Loading today's results…</p></div>
+<script>
+const DATA_URL = 'https://huggingface.co/datasets/nazmh/in-market-results/resolve/main/latest.json';
+const REPO = 'https://github.com/nazia-a11y/in-market-signals';
+const TOPICS = [
+  { id: 1500174, name: 'Colocation' },
+  { id: 1503818, name: 'Data Center Migration' },
+  { id: 1501061, name: 'Cloud Infrastructure' },
+  { id: 1351128, name: 'Hybrid Cloud' },
+  { id: 1502771, name: 'Disaster Recovery as a Service (DRaaS)' },
+  { id: 1502780, name: 'Data Center Sustainability' }
+];
+const INDUSTRIES = ['Financial Services', 'Healthcare', 'Logistics', 'Manufacturing', 'Retail', 'Public Sector', 'Higher Education', 'Technology'];
+const COUNTRIES = ['United Kingdom', 'Ireland'];
+const SIZES = [50, 100, 200, 500];
+const WEB_POINTS = [['Visited the contact', 15], ['Viewed pricing', 15], ['separate visits', 10], ['case study', 5], ['different pages', 5], ['minutes on site', 5], ['Most recent visit', 5]];
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const I = {
+  info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5h.01"/></svg>',
+  close: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>',
+  chev: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  logo: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>',
+  visits: '<path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18"/><path d="M12 3a15 15 0 0 0 0 18"/><circle cx="12" cy="12" r="9"/>',
+  intent: '<path d="M4 18l5-6 4 3 7-9"/><path d="M15 6h5v5"/>',
+  score: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/>',
+  icp: '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
+  ai: '<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>'
+};
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const day = (d) => DAYS[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
+const hhmm = (d) => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+const dur = (s) => s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + String(s % 60).padStart(2, '0') + 's';
+
+let ACC = [], ICP = {}, RUN = '', DEFAULTS = {}, BASE = new Set();
+let state = {}, flipped = {}, justFlipped = null;
+
+function shape(a, icp) {
+  const views = (a.page_views || []).slice().sort((x, y) => y.visited_at.localeCompare(x.visited_at)).map((v) => {
+    const d = new Date(v.visited_at);
+    const u = v.url.replace(/^https?:\/\/[^/]+/, '') || '/';
+    return { when: day(d) + ', ' + hhmm(d), path: u, time: dur(v.seconds), bounce: v.seconds < 30 };
+  });
+  const webReasons = (a.reasons || []).map((r) => {
+    const m = WEB_POINTS.find(([k]) => r.includes(k));
+    return m ? { label: r, pts: '+' + m[1] } : null;
+  }).filter(Boolean);
+  const last = a.page_views && a.page_views.length ? day(new Date(a.page_views.map((v) => v.visited_at).sort().pop())) : '';
+  return {
+    name: a.company, industry: a.industry, emp: a.employees, country: a.country,
+    site: a.web_points || 0, visits: a.visits, views, last, webReasons,
+    surges: (a.surges || []).map((s) => ({ id: s.topic_id, name: s.topic, score: s.surge_score })),
+    why: a.ai && a.ai.why ? a.ai.why : '',
+    customer: !!a.in_crm || (icp.exclude_domains || []).includes(a.domain)
+  };
+}
+
+function compute(st) {
+  const scored = ACC.map((a) => {
+    const rel = a.surges.filter((s) => st.topics.includes(s.id));
+    const best = rel.slice().sort((x, y) => y.score - x.score)[0];
+    const multi = rel.filter((s) => s.score >= 60).length >= 2;
+    const intentReasons = [];
+    let intent = 0;
+    if (best && best.score >= 70) { intent = 40; intentReasons.push({ label: 'Strong surge on ' + best.name + ' (' + best.score + ')', pts: '+40' }); }
+    else if (best && best.score >= 60) { intent = 20; intentReasons.push({ label: 'Moderate surge on ' + best.name + ' (' + best.score + ')', pts: '+20' }); }
+    if (multi) { intent += 10; intentReasons.push({ label: 'Surging on more than one of your topics', pts: '+10' }); }
+    return Object.assign({}, a, { intent, intentReasons, score: Math.min(100, a.site + intent), rel: rel.slice().sort((x, y) => y.score - x.score) });
+  });
+  const maxEmp = ICP.max_employees || 5000;
+  const reasonOf = (a) => {
+    if (a.score < 70) {
+      const other = a.surges.filter((s) => s.score >= 70 && !st.topics.includes(s.id)).sort((x, y) => y.score - x.score)[0];
+      return other ? { text: 'Researching ' + other.name, kind: 'grey' } : { text: 'Not enough intent', kind: 'grey' };
+    }
+    if (a.customer) return { text: 'Existing customer', kind: 'blue' };
+    if (!st.ctys.includes(a.country)) return { text: 'Country not in ICP', kind: 'amber' };
+    if (!st.inds.includes(a.industry)) return { text: 'Industry not in ICP', kind: 'amber' };
+    if (a.emp < st.minSize) return { text: 'Too small', kind: 'amber' };
+    if (a.emp > maxEmp) return { text: 'Too large', kind: 'amber' };
+    return null;
+  };
+  const fits = scored.filter((a) => !reasonOf(a)).sort((x, y) => y.score - x.score);
+  const order = { blue: 0, amber: 1, grey: 2 };
+  const left = scored.map((a) => ({ a, r: reasonOf(a) })).filter((x) => x.r)
+    .sort((x, y) => order[x.r.kind] - order[y.r.kind] || y.a.score - x.a.score);
+  return { scored, fits, left };
+}
+
+function flipBtn(k, light) {
+  const b = !!flipped[k];
+  const cls = b ? 'flipbtn close' : (light ? 'flipbtn light' : 'flipbtn');
+  const label = b ? 'Close explanation' : 'What does this mean?';
+  return '<div class="fbtn"><button type="button" class="' + cls + '" data-flip="' + k + '" aria-label="' + label + '" title="' + label + '">' + (b ? I.close : I.info) + '</button></div>';
+}
+function face(k, front, back, light) {
+  const b = !!flipped[k];
+  const anim = justFlipped === k ? ' flip' : '';
+  return '<div class="rel">' + (b ? back : front).replace('class="', 'class="' + anim.trim() + ' ') + flipBtn(k, light) + '</div>';
+}
+
+function render() {
+  const { scored, fits, left } = compute(state);
+  const hot = scored.filter((a) => a.score >= 70).length;
+  const runDate = RUN ? day(new Date(RUN + 'T06:00')) : '';
+  let h = '';
+  h += '<header><div class="brand"><div class="logo">' + I.logo + '</div><h1>In-Market Signals</h1><span class="tag">Sample data</span></div>'
+    + '<div class="updated"><span class="dot" aria-hidden="true"></span><span>Updated automatically · ' + esc(runDate) + ', 06:00</span></div></header>';
+
+  h += '<section class="kpis" aria-label="Today in numbers">';
+  h += face('k1', '<div class="card kpi"><div class="lab">Visited the website</div><div class="num">' + ACC.length + '</div></div>',
+    '<div class="cardback kpi"><div class="lab">Visited the website</div><p class="p">Companies identified on the website in the last 7 days, from Lead Forensics.</p></div>');
+  h += face('k2', '<div class="card kpi"><div class="lab">Showing buying intent</div><div class="num">' + hot + '</div></div>',
+    '<div class="cardback kpi"><div class="lab">Showing buying intent</div><p class="p" style="font-size:13px">Score of 70 or more, out of 100. Neither source can reach 70 alone.</p>'
+    + '<div class="two" style="font-size:12px;line-height:1.5;gap:10px"><div><div style="font-weight:600">Website · up to 60</div><div>Contact page 15 · Pricing 15</div><div>3+ visits 10 · Case study 5</div><div>5+ pages 5 · 10+ min 5</div><div>Last 2 days 5</div></div>'
+    + '<div><div style="font-weight:600">Topic research · up to 50</div><div>Surge 70+ on a topic 40</div><div>Surge 60–69 20</div><div>2+ topics surging 10</div></div></div></div>');
+  h += face('k3', '<div class="card kpi hero"><div class="lab">In market today</div><div class="num">' + fits.length + '</div></div>',
+    '<div class="cardback kpi"><div class="lab">In market today</div><p class="p">Showing intent and in your ICP. One list, many uses:</p><div style="display:flex;flex-wrap:wrap;gap:4px">'
+    + ['Sales', 'Paid media', 'Email nurture', 'Personalisation'].map((x) => '<span style="font-size:12px;background:#fff;border:1px solid var(--backline);border-radius:999px;padding:1px 8px">' + x + '</span>').join('') + '</div></div>', true);
+  h += '</section>';
+
+  h += '<div class="cols"><main><div style="padding:18px 20px 12px"><h2 style="margin:0">In market today</h2></div><div class="listwrap"><div class="minw">';
+  h += '<div class="grid thead"><span>Company</span><span>Website visits</span><span>Intent topics</span><span>Score</span><span></span></div>';
+  if (!fits.length) h += '<p class="msg">No accounts match this ICP today.</p>';
+  fits.forEach((a) => {
+    const open = state.open === a.name;
+    h += '<div class="row"><button type="button" class="rowbtn grid' + (open ? ' open' : '') + '" data-open="' + esc(a.name) + '" aria-expanded="' + open + '">'
+      + '<span class="stack c-co"><span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="cname">' + esc(a.name) + '</span>' + (BASE.has(a.name) ? '' : '<span class="new">New with this ICP</span>') + '</span>'
+      + '<span class="small">' + esc(a.industry) + ' · ' + a.emp.toLocaleString('en-GB') + ' staff · ' + esc(a.country) + '</span></span>'
+      + '<span class="stack c-vi" style="font-size:13.5px"><span style="font-weight:600">' + a.visits + ' visits · ' + a.views.length + ' pages</span><span style="color:#4B5563">Last visit ' + esc(a.last) + '</span></span>'
+      + '<span class="c-to" style="display:flex;flex-direction:column;gap:4px">' + a.rel.map((s) => '<span class="surge"><b>' + s.score + '</b><span>' + esc(s.name) + '</span></span>').join('') + '</span>'
+      + '<span class="c-sc" style="display:flex;align-items:center;gap:8px"><span class="bar"><span style="width:' + a.score + '%"></span></span><span style="font-size:14px;font-weight:700;width:28px;text-align:right">' + a.score + '</span></span>'
+      + '<span class="c-ch" style="display:flex;transition:transform .2s;transform:rotate(' + (open ? 180 : 0) + 'deg)">' + I.chev + '</span></button>';
+    if (open) {
+      h += '<div class="detail"><div><div class="cap">Why it is in market</div><p class="why">' + esc(a.why || 'Summary appears after the next daily run.') + '</p></div>'
+        + '<div><div class="cap">Score breakdown</div><div class="two">'
+        + '<div class="box"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Website behaviour</span><span style="font-size:15px;font-weight:700">' + a.site + ' / 60</span></div>'
+        + a.webReasons.map((r) => '<div class="line"><span>' + esc(r.label) + '</span><span class="pts">' + r.pts + '</span></div>').join('') + '</div>'
+        + '<div class="box"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Topic research</span><span style="font-size:15px;font-weight:700">' + a.intent + ' / 50</span></div>'
+        + a.intentReasons.map((r) => '<div class="line"><span>' + esc(r.label) + '</span><span class="pts">' + r.pts + '</span></div>').join('') + '</div>'
+        + '</div>' + (a.site + a.intent > 100 ? '<p style="margin:6px 0 0;font-size:12.5px;color:var(--muted)">Total capped at 100.</p>' : '') + '</div>'
+        + '<div><div class="cap">Pages visited</div><div class="box" style="padding:0;overflow-x:auto"><table><thead><tr><th>When</th><th>Page</th><th style="text-align:right">Time on page</th></tr></thead><tbody>'
+        + a.views.map((v) => '<tr' + (v.bounce ? ' class="bounce"' : '') + '><td style="white-space:nowrap">' + esc(v.when) + '</td><td class="path">' + esc(v.path) + '</td><td style="text-align:right;white-space:nowrap">' + (v.bounce ? '<span class="bnc">Bounce</span>' : '') + esc(v.time) + '</td></tr>').join('')
+        + '</tbody></table></div></div></div>';
+    }
+    h += '</div>';
+  });
+  h += '</div></div></main><aside>';
+
+  const step = (icon, label) => '<div class="step"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + icon + '</svg></span><span>' + label + '</span></div>';
+  const arrow = '<span class="arrow" aria-hidden="true">›</span>';
+  h += face('how', '<section class="card"><h2 style="margin-bottom:14px">How it works</h2><div class="flow">' + [step(I.visits, 'Visits'), step(I.intent, 'Intent'), step(I.score, 'Score'), step(I.icp, 'ICP'), step(I.ai, 'AI summary')].join(arrow) + '</div></section>',
+    '<section class="cardback"><h2>How it works</h2><ol><li>Every weekday at 6am, website visits come in from Lead Forensics.</li><li>Bombora adds which of those companies are researching your topics.</li><li>Fixed rules score each company out of 100.</li><li>Your ICP removes poor fits and existing customers.</li><li>Claude writes a short summary for each account left.</li></ol>'
+    + '<p class="p" style="font-size:12.5px;color:#4B5563">Companies are invented; topics are real Bombora topics.</p><a href="' + REPO + '" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;text-decoration:none">See the code and daily run history ↗</a></section>');
+
+  const chip = (on, label, attr) => '<button type="button" class="chip' + (on ? ' on' : '') + '" aria-pressed="' + on + '" ' + attr + '>' + esc(label) + '</button>';
+  h += face('icp', '<section class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-right:40px"><h2 style="margin:0;padding:0">Your ICP</h2><button type="button" class="reset" data-reset="1">Reset</button></div>'
+    + '<div class="label">Industries</div><div class="chips">' + INDUSTRIES.map((x) => chip(state.inds.includes(x), x, 'data-ind="' + esc(x) + '"')).join('') + '</div>'
+    + '<div class="label">Intent topics</div><div class="chips">' + TOPICS.map((t) => chip(state.topics.includes(t.id), t.name, 'data-topic="' + t.id + '"')).join('') + '</div>'
+    + '<div class="label">Countries</div><div class="chips">' + COUNTRIES.map((x) => chip(state.ctys.includes(x), x, 'data-cty="' + esc(x) + '"')).join('') + '</div>'
+    + '<div class="label">Minimum company size</div><div class="seg">' + SIZES.map((n) => '<button type="button" class="' + (state.minSize === n ? 'on' : '') + '" aria-pressed="' + (state.minSize === n) + '" data-size="' + n + '">' + n + '+</button>').join('') + '</div>'
+    + '<div style="display:flex;justify-content:space-between;font-size:13.5px;color:#374151"><span>Existing customers</span><span style="font-weight:600">Always left out</span></div></section>',
+    '<section class="cardback"><h2>Your ICP</h2><p class="p">The ideal customer profile decides which companies showing intent are worth acting on.</p><p class="p">Change any option and the list updates straight away. Accounts it adds are tagged <span class="new">New with this ICP</span></p><p class="p" style="margin:0">Intent only counts on the topics ticked here.</p></section>');
+
+  h += face('left', '<section class="card"><h2>Left out today</h2><div style="display:flex;flex-direction:column">'
+    + left.map((x) => '<div class="lrow"><span class="stack"><span style="font-size:14px;font-weight:500">' + esc(x.a.name) + '</span><span style="font-size:12px;color:var(--muted)">Score ' + x.a.score + '</span></span><span class="pill ' + x.r.kind + '">' + esc(x.r.text) + '</span></div>').join('') + '</div></section>',
+    '<section class="cardback"><h2>Left out today</h2><p class="p">Companies that visited but are not a match today.</p><div style="display:flex;flex-direction:column;gap:8px;font-size:13px">'
+    + '<div style="display:flex;gap:8px;align-items:center"><span class="pill blue">Existing customer</span><span>already buys from you</span></div>'
+    + '<div style="display:flex;gap:8px;align-items:center"><span class="pill amber">Outside ICP</span><span>wrong size, industry or country</span></div>'
+    + '<div style="display:flex;gap:8px;align-items:center"><span class="pill grey">Not enough intent</span><span>score under 70, or researching a topic you have not ticked</span></div></div></section>');
+
+  const need = [['Lead Forensics', 'Who visited your website, page by page', 'amber', 'Subscription'], ['Bombora Company Surge', 'Which companies are researching your topics', 'amber', 'Subscription'], ['Claude API (Anthropic)', 'Writes the summaries', 'blue', 'Pay as you go'], ['GitHub', 'Runs the engine every weekday', 'green', 'Free'], ['Hugging Face', 'Stores results and hosts this dashboard', 'green', 'Free'], ['HubSpot and Slack', 'Receive the daily list', 'grey', 'Optional']];
+  h += face('org', '<section class="card"><h2 style="margin-bottom:4px">Use it in your organisation</h2><p class="p" style="font-size:13px;color:var(--muted)">What you need to run this on your own data</p><div style="display:flex;flex-direction:column">'
+    + need.map(([n, d, k, t]) => '<div class="lrow"><span class="stack"><span style="font-size:14px;font-weight:500">' + n + '</span><span style="font-size:12px;color:var(--muted)">' + d + '</span></span><span class="pill ' + k + '" style="font-size:11.5px;padding:2px 9px">' + t + '</span></div>').join('') + '</div></section>',
+    '<section class="cardback"><h2>Setting it up</h2><ol><li>Copy the code into a private GitHub repository.</li><li>Add your Lead Forensics, Bombora and Claude API keys as encrypted secrets. Add HubSpot and Slack if you use them.</li><li>Set your ICP: industries, company size, countries, the Bombora topics you sell into and the CRM stages to leave out.</li><li>Switch off sample data so the engine reads your live feeds.</li><li>Keep the results private, and point the dashboard at them.</li></ol>'
+    + '<h3 style="margin:0 0 6px;font-size:14px;font-weight:700">How it runs</h3><p class="p" style="margin:0">Every weekday at 6am the engine pulls the last 7 days of visits and intent, scores each company, applies your ICP and writes the summaries. The list lands here, in HubSpot and in Slack before the working day starts. Nobody needs to press anything, and changing the ICP takes effect on the next run.</p></section>');
+
+  h += '</aside></div>';
+  h += '<footer>Sample companies and website visits · <a href="' + REPO + '" target="_blank" rel="noopener">Code on GitHub</a></footer>';
+  document.getElementById('app').innerHTML = h;
+  justFlipped = null;
+}
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  const d = t.dataset;
+  const tog = (arr, v) => arr.includes(v) ? arr.filter((x) => x !== v) : arr.concat([v]);
+  if (d.flip) { flipped[d.flip] = !flipped[d.flip]; justFlipped = d.flip; }
+  else if (d.open !== undefined) state.open = state.open === d.open ? null : d.open;
+  else if (d.ind) state.inds = tog(state.inds, d.ind);
+  else if (d.topic) state.topics = tog(state.topics, Number(d.topic));
+  else if (d.cty) state.ctys = tog(state.ctys, d.cty);
+  else if (d.size) state.minSize = Number(d.size);
+  else if (d.reset) state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), { open: state.open });
+  else return;
+  render();
+  if (d.flip) { const b = document.querySelector('[data-flip="' + d.flip + '"]'); if (b) b.focus(); }
+});
+
+fetch(DATA_URL, { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((data) => {
+  ICP = data.icp || {};
+  RUN = data.run_date || '';
+  ACC = (data.accounts || []).map((a) => shape(a, ICP));
+  DEFAULTS = {
+    inds: (ICP.industries || []).slice(),
+    topics: (ICP.topics || []).map((t) => t.id),
+    ctys: (ICP.countries || []).slice(),
+    minSize: ICP.min_employees || 200
+  };
+  state = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), { open: null });
+  BASE = new Set(compute(DEFAULTS).fits.map((a) => a.name));
+  state.open = compute(state).fits[0] ? compute(state).fits[0].name : null;
+  render();
+}).catch(() => {
+  document.getElementById('app').innerHTML = '<p class="msg">Today\'s results could not be loaded. Please refresh in a moment.</p>';
+});
+</script>
+</body>
+</html>
