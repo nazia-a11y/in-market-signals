@@ -136,6 +136,28 @@ const hhmm = (d) => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMi
 const dur = (s) => s < 60 ? s + 's' : Math.floor(s / 60) + 'm ' + String(s % 60).padStart(2, '0') + 's';
 
 let ACC = [], ICP = {}, RUN = '', DEFAULTS = {}, BASE = new Set();
+// The sample data is fixed, so its dates are moved to match the day the page is opened:
+// the latest run is the most recent weekday at 06:00, and it covers activity to the end of the day before.
+const WIN = (() => {
+  const run = new Date();
+  if (run.getHours() < 6) run.setDate(run.getDate() - 1);
+  while (run.getDay() === 0 || run.getDay() === 6) run.setDate(run.getDate() - 1);
+  run.setHours(6, 0, 0, 0);
+  const end = new Date(run); end.setDate(end.getDate() - 1);
+  return { run, end };
+})();
+function shiftDates(accounts) {
+  const stamps = accounts.flatMap((a) => (a.page_views || []).map((v) => v.visited_at)).sort();
+  if (!stamps.length) return;
+  const last = new Date(stamps.pop().slice(0, 10) + 'T12:00');
+  const target = new Date(WIN.end); target.setHours(12, 0, 0, 0);
+  const days = Math.round((target - last) / 86400000);
+  const pad = (n) => String(n).padStart(2, '0');
+  accounts.forEach((a) => (a.page_views || []).forEach((v) => {
+    const d = new Date(v.visited_at); d.setDate(d.getDate() + days);
+    v.visited_at = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }));
+}
 let state = {}, flipped = {}, justFlipped = null;
 
 function shape(a, icp) {
@@ -205,14 +227,13 @@ function face(k, front, back, light) {
 function render() {
   const { scored, fits, left } = compute(state);
   const hot = scored.filter((a) => a.score >= 70).length;
-  const runDate = RUN ? day(new Date(RUN + 'T06:00')) : '';
   let h = '';
   h += '<header><div class="brand"><div class="logo">' + I.logo + '</div><h1>In-Market Signals</h1><span class="tag">Sample data</span></div>'
-    + '<div class="hright"><div class="updated"><span class="dot" aria-hidden="true"></span><span>Updated automatically · ' + esc(runDate) + ', 06:00</span></div><a class="gh" href="' + REPO + '" target="_blank" rel="noopener">' + I.code + 'View the code on GitHub</a></div></header>';
+    + '<div class="hright"><div class="updated"><span class="dot" aria-hidden="true"></span><span>Refreshed ' + esc(day(WIN.run)) + ', 06:00 · activity to end of ' + esc(day(WIN.end)) + '</span></div><a class="gh" href="' + REPO + '" target="_blank" rel="noopener">' + I.code + 'View the code on GitHub</a></div></header>';
 
   h += '<section class="kpis" aria-label="Today in numbers">';
   h += face('k1', '<div class="card kpi"><div class="lab">Visited the website</div><div class="num">' + ACC.length + '</div></div>',
-    '<div class="cardback kpi"><div class="lab">Visited the website</div><p class="p">Companies identified on the website in the last 7 days, from Lead Forensics.</p></div>');
+    '<div class="cardback kpi"><div class="lab">Visited the website</div><p class="p">Companies identified on the website by Lead Forensics in the 7 days up to the end of ' + esc(day(WIN.end)) + '.</p></div>');
   h += face('k2', '<div class="card kpi"><div class="lab">Showing buying intent</div><div class="num">' + hot + '</div></div>',
     '<div class="cardback kpi"><div class="lab">Showing buying intent</div><p class="p" style="font-size:13px">Score of 70 or more, out of 100. Neither source can reach 70 alone.</p>'
     + '<div class="two" style="font-size:12px;line-height:1.5;gap:10px"><div><div style="font-weight:600">Website · up to 60</div><div>Contact page 15 · Pricing 15</div><div>3+ visits 10 · Case study 5</div><div>5+ pages 5 · 10+ min 5</div><div>Last 2 days 5</div></div>'
@@ -253,8 +274,8 @@ function render() {
   const step = (icon, label) => '<div class="step"><span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + icon + '</svg></span><span>' + label + '</span></div>';
   const arrow = '<span class="arrow" aria-hidden="true">›</span>';
   h += face('how', '<section class="card"><h2 style="margin-bottom:14px">How it works</h2><div class="flow">' + [step(I.visits, 'Visits'), step(I.intent, 'Intent'), step(I.score, 'Score'), step(I.icp, 'ICP'), step(I.ai, 'AI summary')].join(arrow) + '</div></section>',
-    '<section class="cardback"><h2>How it works</h2><ol><li>Every weekday at 6am, website visits come in from Lead Forensics.</li><li>Bombora adds which of those companies are researching your topics.</li><li>Fixed rules score each company out of 100.</li><li>Your ICP removes poor fits and existing customers.</li><li>Claude writes a short summary for each account left.</li></ol>'
-    + '<p class="p" style="font-size:12.5px;color:#4B5563">Companies are invented; topics are real Bombora topics.</p><a href="' + REPO + '" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;text-decoration:none">See the code and daily run history ↗</a></section>');
+    '<section class="cardback"><h2>How it works</h2><ol><li>Every weekday at 6am, Lead Forensics supplies the last 7 days of website visits, up to the end of the previous day.</li><li>Bombora adds which of those companies are researching your topics.</li><li>Fixed rules score each company out of 100.</li><li>Your ICP removes poor fits and existing customers.</li><li>Claude writes a short summary for each account left.</li></ol>'
+    + '<p class="p" style="font-size:12.5px;color:#4B5563">Website visits change every day. Bombora refreshes intent weekly, or daily on premium plans, so topic scores move more slowly.</p><p class="p" style="font-size:12.5px;color:#4B5563">Companies are invented; topics are real Bombora topics.</p><a href="' + REPO + '" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;text-decoration:none">See the code and daily run history ↗</a></section>');
 
   const chip = (on, label, attr) => '<button type="button" class="chip' + (on ? ' on' : '') + '" aria-pressed="' + on + '" ' + attr + '>' + esc(label) + '</button>';
   h += face('icp', '<section class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-right:40px"><h2 style="margin:0;padding:0">Your ICP</h2><button type="button" class="reset" data-reset="1">Reset</button></div>'
@@ -276,7 +297,7 @@ function render() {
   h += face('org', '<section class="card"><h2 style="margin-bottom:4px">Use it in your organisation</h2><p class="p" style="font-size:13px;color:var(--muted)">What you need to run this on your own data</p><div style="display:flex;flex-direction:column">'
     + need.map(([n, d, k, t]) => '<div class="lrow"><span class="stack"><span style="font-size:14px;font-weight:500">' + n + '</span><span style="font-size:12px;color:var(--muted)">' + d + '</span></span><span class="pill ' + k + '" style="font-size:11.5px;padding:2px 9px">' + t + '</span></div>').join('') + '</div></section>',
     '<section class="cardback"><h2>Setting it up</h2><ol><li>Copy the code into a private GitHub repository.</li><li>Add your Lead Forensics, Bombora and Claude API keys as encrypted secrets. Add HubSpot and Slack if you use them.</li><li>Set your ICP: industries, company size, countries, the Bombora topics you sell into and the CRM stages to leave out.</li><li>Switch off sample data so the engine reads your live feeds.</li><li>Keep the results private, and point the dashboard at them.</li></ol>'
-    + '<h3 style="margin:0 0 6px;font-size:14px;font-weight:700">How it runs</h3><p class="p" style="margin:0">Every weekday at 6am the engine pulls the last 7 days of visits and intent, scores each company, applies your ICP and writes the summaries. The list lands here, in HubSpot and in Slack before the working day starts. Nobody needs to press anything, and changing the ICP takes effect on the next run.</p></section>');
+    + '<h3 style="margin:0 0 6px;font-size:14px;font-weight:700">How it runs</h3><p class="p" style="margin:0">Every weekday at 6am the engine pulls the last 7 days of visits, up to the end of the previous day, and the latest Bombora intent, scores each company, applies your ICP and writes the summaries. The list lands here, in HubSpot and in Slack before the working day starts. Nobody needs to press anything, and changing the ICP takes effect on the next run.</p></section>');
 
   h += '</aside></div>';
   h += '<footer>Sample companies and website visits · <a href="' + REPO + '" target="_blank" rel="noopener">Code on GitHub</a></footer>';
@@ -304,6 +325,7 @@ document.addEventListener('click', (e) => {
 fetch(DATA_URL, { cache: 'no-store' }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((data) => {
   ICP = data.icp || {};
   RUN = data.run_date || '';
+  shiftDates(data.accounts || []);
   ACC = (data.accounts || []).map((a) => shape(a, ICP));
   DEFAULTS = {
     inds: (ICP.industries || []).slice(),
