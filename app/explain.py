@@ -26,10 +26,13 @@ def explain(account):
     client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
     message = client.messages.create(
         model=config.CLAUDE_MODEL,
-        max_tokens=300,
+        max_tokens=1024,
         messages=[{"role": "user", "content": PROMPT.format(facts=facts)}],
     )
-    text = message.content[0].text.strip()
+    parts = [b.text for b in message.content if getattr(b, "type", "") == "text"]
+    if not parts:
+        return {"why": "AI step returned no text.", "opener": ""}
+    text = parts[0].strip()
     if text.startswith("```"):
         text = text.split("\n", 1)[1].rsplit("```", 1)[0]
     try:
