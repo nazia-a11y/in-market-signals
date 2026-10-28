@@ -1,0 +1,11 @@
+[
+  {"domain": "northbridge-logistics.example", "topic": "Colocation", "surge_score": 84},
+  {"domain": "northbridge-logistics.example", "topic": "Data Center Migration", "surge_score": 71},
+  {"domain": "fenwick-health.example", "topic": "Colocation", "surge_score": 66},
+  {"domain": "arden-retail.example", "topic": "Cloud Infrastructure", "surge_score": 58},
+  {"domain": "clydeside-eng.example", "topic": "Data Center Migration", "surge_score": 77},
+  {"domain": "harbourview-ins.example", "topic": "Email Marketing", "surge_score": 80},
+  {"domain": "kestrel-fintech.example", "topic": "Cloud Infrastructure", "surge_score": 88},
+  {"domain": "kestrel-fintech.example", "topic": "Colocation", "surge_score": 74},
+  {"domain": "lomond-bank.example", "topic": "Cloud Infrastructure", "surge_score": 79}
+]

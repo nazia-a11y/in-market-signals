@@ -1,0 +1,11 @@
+[
+  {"company": "Northbridge Logistics", "domain": "northbridge-logistics.example", "industry": "Logistics", "employees": 850, "country": "United Kingdom", "visits": 5, "pages": ["/pricing", "/colocation", "/case-studies/retail"]},
+  {"company": "Fenwick Health Group", "domain": "fenwick-health.example", "industry": "Healthcare", "employees": 1200, "country": "United Kingdom", "visits": 3, "pages": ["/colocation", "/pricing"]},
+  {"company": "Arden Retail", "domain": "arden-retail.example", "industry": "Retail", "employees": 3000, "country": "United Kingdom", "visits": 1, "pages": ["/blog/cloud-costs"]},
+  {"company": "Clydeside Engineering", "domain": "clydeside-eng.example", "industry": "Manufacturing", "employees": 120, "country": "United Kingdom", "visits": 4, "pages": ["/case-studies/manufacturing", "/contact"]},
+  {"company": "Harbourview Insurance", "domain": "harbourview-ins.example", "industry": "Financial Services", "employees": 640, "country": "Ireland", "visits": 2, "pages": ["/pricing"]},
+  {"company": "Moorland Energy", "domain": "moorland-energy.example", "industry": "Energy", "employees": 400, "country": "United Kingdom", "visits": 1, "pages": ["/careers"]},
+  {"company": "Kestrel Fintech", "domain": "kestrel-fintech.example", "industry": "Financial Services", "employees": 450, "country": "United Kingdom", "visits": 6, "pages": ["/pricing", "/security", "/case-studies/finance"]},
+  {"company": "Thistle Media", "domain": "thistle-media.example", "industry": "Media", "employees": 60, "country": "United Kingdom", "visits": 2, "pages": ["/blog/ai-infrastructure"]},
+  {"company": "Lomond Bank", "domain": "lomond-bank.example", "industry": "Financial Services", "employees": 2200, "country": "United Kingdom", "visits": 4, "pages": ["/pricing", "/support"]}
+]
