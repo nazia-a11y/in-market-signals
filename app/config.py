@@ -14,7 +14,5 @@ HUBSPOT_TOKEN = os.getenv("HUBSPOT_TOKEN", "")
 HF_TOKEN = os.getenv("HF_TOKEN", "")
 HF_DATASET_REPO = os.getenv("HF_DATASET_REPO", "")
 
-TOPICS = [t.strip() for t in os.getenv(
-    "TOPICS", "Colocation,Data Center Migration,Cloud Infrastructure").split(",")]
 HOT_THRESHOLD = int(os.getenv("HOT_THRESHOLD", "70"))
 TOP_N = int(os.getenv("TOP_N", "10"))

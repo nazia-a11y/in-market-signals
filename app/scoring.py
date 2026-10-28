@@ -1,7 +1,7 @@
 from app import config, icp
 
 
-def score_account(visit, surges):
+def score_account(visit, surges, topic_ids):
     score = 0
     reasons = []
     pages = visit.get("pages", [])
@@ -16,7 +16,7 @@ def score_account(visit, surges):
         score += 20
         reasons.append(f"{visit['visits']} visits recently")
 
-    relevant = [s for s in surges if s["topic"] in config.TOPICS]
+    relevant = [s for s in surges if s["topic_id"] in topic_ids]
     if relevant:
         top = max(relevant, key=lambda s: s["surge_score"])
         if top["surge_score"] >= 70:
@@ -37,11 +37,12 @@ def build_accounts(visits, surge_rows, rules):
     for row in surge_rows:
         surge_by_domain.setdefault(row["domain"], []).append(row)
 
+    topic_ids = {t["id"] for t in rules.get("topics", [])}
     crm = icp.crm_excluded_domains(rules)
     accounts = []
     for v in visits:
         surges = surge_by_domain.get(v["domain"], [])
-        score, reasons = score_account(v, surges)
+        score, reasons = score_account(v, surges, topic_ids)
         in_crm = v["domain"] in crm
         fits, gaps = icp.check_fit(v, rules, in_crm)
         hot = score >= config.HOT_THRESHOLD
