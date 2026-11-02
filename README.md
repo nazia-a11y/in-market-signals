@@ -62,7 +62,7 @@ Neither source can reach the threshold of 70 on its own, so an account only coun
 
 **Existing customers are left out automatically.** When HubSpot is connected, each run checks it for companies that are customers or have an open deal. A customer browsing the pricing page looks exactly like a hot prospect, and should never be targeted as one.
 
-**Topics follow Bombora's taxonomy.** The ICP lists intent topics by their Bombora Topic ID (for example Colocation, 1500174). Surges are matched on that ID rather than the name, so a renamed topic cannot silently break the scoring.
+**Topics follow Bombora's taxonomy.** The ICP lists intent topics by their Bombora Topic ID (for example Payroll Software, 1508992). Surges are matched on that ID rather than the name, so a renamed topic cannot silently break the scoring.
 
 **Every likely account is summarised.** Claude writes a summary for every company that would reach the threshold on any of the topics we track, not only those in today's ICP. When someone widens the ICP on the dashboard, the accounts it adds already have their explanation.
 
