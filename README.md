@@ -1,10 +1,10 @@
-# In-Market Signals
+# Intent Signals to Pipeline
 
 [![Daily run](https://github.com/nazia-a11y/in-market-signals/actions/workflows/daily.yml/badge.svg)](https://github.com/nazia-a11y/in-market-signals/actions/workflows/daily.yml)
 
 **[Open the live dashboard →](https://nazmh-in-market-signals-dashboard.static.hf.space)**
 
-[![The In-Market Signals dashboard](docs/dashboard.png)](https://nazmh-in-market-signals-dashboard.static.hf.space)
+[![The Intent Signals to Pipeline dashboard](docs/dashboard.png)](https://nazmh-in-market-signals-dashboard.static.hf.space)
 
 ## The problem
 
